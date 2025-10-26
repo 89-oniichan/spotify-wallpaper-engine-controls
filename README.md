@@ -91,12 +91,12 @@ Spotify should pause/play instantly!
 | **Volume Down** | `powershell.exe -ExecutionPolicy Bypass -File "C:\Tools\volumedown.ps1"` |
 | **Mute/Unmute** | `powershell.exe -ExecutionPolicy Bypass -File "C:\Tools\mute.ps1"` |
 
-### Step 5: Done! 🎉
+### Step 5: Done! 
 Your Spotify controls are now fully integrated with Wallpaper Engine!
 
 ---
 
-## 🎮 How It Works
+## How It Works
 
 These scripts use Windows' native media key functionality via PowerShell and the `user32.dll` library. They simulate media key presses (Play/Pause, Next, Previous, Volume) that Spotify recognizes system-wide.
 
