@@ -5,7 +5,7 @@
 
 > Full media control for Spotify through Wallpaper Engine on Windows — No API needed!
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20Site-1DB954?style=for-the-badge&logo=spotify)](https://89-oniichan.github.io/spotify-wallpaper-controls/)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20Site-1DB954?style=for-the-badge&logo=spotify)](https://89-oniichan.github.io/spotify-wallpaper-engine-controls/)
 
 Control Spotify directly from your Wallpaper Engine with lightweight PowerShell scripts. Play, pause, skip tracks, and adjust volume — all without touching your keyboard or mouse!
 
@@ -39,7 +39,7 @@ Control Spotify directly from your Wallpaper Engine with lightweight PowerShell 
 ## 📥 Quick Start
 
 ### Option 1: Download from Website (Recommended)
-👉 **[Visit the Live Page](https://89-oniichan.github.io/spotify-wallpaper-controls/)**
+👉 **[Visit the Live Page](https://89-oniichan.github.io/spotify-wallpaper-engine-controls/)**
 
 Click "Download All Scripts" and follow the on-page instructions!
 
