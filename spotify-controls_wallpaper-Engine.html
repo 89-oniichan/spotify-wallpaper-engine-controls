@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Control Suite • Wallpaper Engine</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --spotify-green: #1db954;
+            --spotify-dark: #121212;
+            --terminal-green: #00ff41;
+            --accent-cyan: #00d9ff;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --surface-dark: #181818;
+            --surface-elevated: #282828;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000000;
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 0;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(29, 185, 84, 0.03) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 217, 255, 0.02) 0%, transparent 20%),
+                radial-gradient(circle at 50% 50%, rgba(29, 185, 84, 0.02) 0%, transparent 15%);
+            animation: particleFloat 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--spotify-green), var(--accent-cyan));
+            width: 0%;
+            z-index: 9999;
+            transition: width 0.1s ease;
+            box-shadow: 0 0 10px rgba(29, 185, 84, 0.5);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(29, 185, 84, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(0, 217, 255, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.1);
+            }
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(29, 185, 84, 0.03) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 217, 255, 0.02) 0%, transparent 20%),
+                radial-gradient(circle at 50% 50%, rgba(29, 185, 84, 0.02) 0%, transparent 15%);
+            animation: particleFloat 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes particleFloat {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+            }
+            33% {
+                transform: translateY(-20px) translateX(10px);
+            }
+            66% {
+                transform: translateY(10px) translateX(-10px);
+            }
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.3;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+        }
+
+        .terminal-prompt {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--terminal-green);
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            overflow: hidden;
+            border-right: 2px solid var(--terminal-green);
+            white-space: nowrap;
+            width: 0;
+            display: inline-block;
+            animation: typing 2.5s steps(35) 0.5s forwards, blink 0.75s step-end infinite 0.5s;
+        }
+
+        @keyframes typing {
+            from { 
+                width: 0; 
+            }
+            to { 
+                width: 100%; 
+            }
+        }
+
+        @keyframes blink {
+            0%, 49% { 
+                border-color: var(--terminal-green); 
+            }
+            50%, 100% { 
+                border-color: transparent; 
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            font-size: 4em;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--spotify-green) 0%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            letter-spacing: -0.02em;
+            opacity: 0;
+            animation: fadeInUp 0.8s 0.2s ease forwards, titleGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% {
+                filter: drop-shadow(0 0 0px rgba(29, 185, 84, 0));
+            }
+            50% {
+                filter: drop-shadow(0 0 20px rgba(29, 185, 84, 0.3));
+            }
+        }
+
+        .header .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.25em;
+            font-weight: 500;
+            opacity: 0;
+            animation: fadeInUp 0.8s 0.4s ease forwards;
+        }
+
+        .download-section {
+            background: linear-gradient(135deg, rgba(29, 185, 84, 0.15) 0%, rgba(0, 217, 255, 0.1) 100%);
+            backdrop-filter: blur(20px);
+            padding: 50px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 60px;
+            border: 1px solid rgba(29, 185, 84, 0.3);
+            box-shadow: 
+                0 8px 32px rgba(29, 185, 84, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            animation: fadeInUp 0.8s 0.6s ease forwards;
+        }
+
+        .download-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                60deg,
+                transparent,
+                rgba(29, 185, 84, 0.05),
+                transparent,
+                rgba(0, 217, 255, 0.03),
+                transparent
+            );
+            animation: shimmer 4s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% { 
+                transform: translateX(-100%) translateY(-100%) rotate(45deg); 
+            }
+            100% { 
+                transform: translateX(100%) translateY(100%) rotate(45deg); 
+            }
+        }
+
+        .download-section h2 {
+            font-size: 1.8em;
+            margin-bottom: 30px;
+            color: var(--text-primary);
+            font-weight: 700;
+            position: relative;
+        }
+
+        .download-section h2::after {
+            content: 'Press D to download all';
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.4em;
+            color: var(--text-secondary);
+            opacity: 0.6;
+            font-weight: 400;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .download-btn {
+            background: rgba(29, 185, 84, 0.1);
+            color: var(--spotify-green);
+            border: 2px solid var(--spotify-green);
+            padding: 18px 40px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Inter', sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: var(--spotify-green);
+            transition: width 0.6s, height 0.6s, top 0.6s, left 0.6s;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+        }
+
+        .download-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .download-btn:active::before {
+            width: 350px;
+            height: 350px;
+            transition: width 0.3s, height 0.3s;
+        }
+
+        .download-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(29, 185, 84, 0.5);
+            transform: translate(-50%, -50%);
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .download-btn:active::after {
+            width: 400px;
+            height: 400px;
+            transition: width 0.5s ease-out, height 0.5s ease-out, opacity 0.5s ease-out;
+            opacity: 0;
+        }
+
+        .download-btn:hover {
+            color: #000;
+            border-color: var(--spotify-green);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(29, 185, 84, 0.4);
+        }
+
+        .download-btn:active {
+            transform: translateY(0);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 50px 0;
+        }
+
+        .feature-card {
+            background: rgba(24, 24, 24, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(29, 185, 84, 0.1) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-card:hover {
+            border-color: var(--spotify-green);
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(29, 185, 84, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 12px rgba(29, 185, 84, 0.3));
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.2) rotateZ(10deg);
+            animation: iconBounce 0.6s ease;
+        }
+
+        @keyframes iconBounce {
+            0%, 100% {
+                transform: scale(1.2) rotateZ(10deg);
+            }
+            25% {
+                transform: scale(1.3) rotateZ(15deg);
+            }
+            50% {
+                transform: scale(1.15) rotateZ(5deg);
+            }
+            75% {
+                transform: scale(1.25) rotateZ(12deg);
+            }
+        }
+
+        .feature-card h3 {
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            font-size: 1.3em;
+            font-weight: 700;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.95em;
+        }
+
+        .step {
+            background: rgba(24, 24, 24, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            margin-bottom: 30px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--spotify-green), var(--accent-cyan));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .step::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 0;
+            background: linear-gradient(180deg, var(--spotify-green), var(--accent-cyan));
+            border-radius: 16px 0 0 16px;
+            transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .step:hover::after {
+            height: 100%;
+        }
+
+        .step:hover::before {
+            opacity: 0;
+        }
+
+        .step:hover {
+            background: rgba(28, 28, 28, 0.7);
+            border-color: rgba(29, 185, 84, 0.3);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 20px;
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, var(--spotify-green), var(--accent-cyan));
+            color: #000;
+            width: 50px;
+            height: 50px;
+            line-height: 50px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 800;
+            font-size: 1.5em;
+            flex-shrink: 0;
+            box-shadow: 0 4px 16px rgba(29, 185, 84, 0.4);
+            animation: numberPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes numberPulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 4px 16px rgba(29, 185, 84, 0.4);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 6px 24px rgba(29, 185, 84, 0.6);
+            }
+        }
+
+        .step h2 {
+            color: var(--text-primary);
+            font-size: 1.6em;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .step p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            font-size: 1.05em;
+            line-height: 1.7;
+        }
+
+        .terminal {
+            background: #0a0a0a;
+            border-radius: 12px;
+            padding: 0;
+            margin: 20px 0;
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            overflow: hidden;
+            box-shadow: 
+                0 4px 20px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(0, 255, 65, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .terminal.typing-active {
+            border-color: rgba(0, 255, 65, 0.5);
+            box-shadow: 
+                0 4px 20px rgba(0, 0, 0, 0.5),
+                0 0 30px rgba(0, 255, 65, 0.2),
+                inset 0 1px 0 rgba(0, 255, 65, 0.2);
+        }
+
+        .terminal-header {
+            background: #161616;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid rgba(0, 255, 65, 0.1);
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .terminal-dot:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        .dot-close { 
+            background: #ff5f56;
+        }
+        
+        .dot-close:hover {
+            animation: pulse 0.5s ease;
+        }
+        
+        .dot-minimize { 
+            background: #ffbd2e;
+        }
+        
+        .dot-minimize:hover {
+            animation: pulse 0.5s ease 0.1s;
+        }
+        
+        .dot-maximize { 
+            background: #27c93f;
+        }
+        
+        .dot-maximize:hover {
+            animation: pulse 0.5s ease 0.2s;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.3);
+            }
+        }
+
+        /* Custom Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: linear-gradient(135deg, rgba(24, 24, 24, 0.98) 0%, rgba(18, 18, 18, 0.98) 100%);
+            border: 1px solid rgba(29, 185, 84, 0.3);
+            border-radius: 20px;
+            padding: 0;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.5),
+                0 0 40px rgba(29, 185, 84, 0.2);
+            transform: scale(0.9);
+            animation: modalPop 0.3s ease forwards;
+            overflow: hidden;
+        }
+
+        @keyframes modalPop {
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, rgba(29, 185, 84, 0.15) 0%, rgba(0, 217, 255, 0.1) 100%);
+            padding: 25px 30px;
+            border-bottom: 1px solid rgba(29, 185, 84, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            color: var(--text-primary);
+            font-size: 1.5em;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: rgba(255, 95, 86, 0.1);
+            border: 1px solid rgba(255, 95, 86, 0.3);
+            color: #ff5f56;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: #ff5f56;
+            color: #000;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .file-item {
+            background: rgba(30, 30, 30, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 18px 20px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--spotify-green), var(--accent-cyan));
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .file-item:hover::before {
+            transform: scaleY(1);
+        }
+
+        .file-item:hover {
+            background: rgba(40, 40, 40, 0.8);
+            border-color: rgba(29, 185, 84, 0.4);
+            transform: translateX(5px);
+        }
+
+        .file-item:active {
+            transform: translateX(5px) scale(0.98);
+        }
+
+        .file-icon {
+            font-size: 2em;
+            flex-shrink: 0;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 4px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .file-desc {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        .download-all-modal {
+            background: linear-gradient(135deg, rgba(29, 185, 84, 0.15) 0%, rgba(0, 217, 255, 0.1) 100%);
+            border: 2px solid var(--spotify-green);
+        }
+
+        .download-all-modal:hover {
+            background: linear-gradient(135deg, rgba(29, 185, 84, 0.25) 0%, rgba(0, 217, 255, 0.15) 100%);
+            box-shadow: 0 0 20px rgba(29, 185, 84, 0.3);
+        }
+
+        .download-all-modal .file-icon {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, rgba(29, 185, 84, 0.95) 0%, rgba(0, 217, 255, 0.95) 100%);
+            color: #000;
+            padding: 18px 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(29, 185, 84, 0.4);
+            font-weight: 600;
+            z-index: 10001;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: toastIn 0.3s ease forwards, toastOut 0.3s ease 2.7s forwards;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1em;
+        }
+
+        @keyframes toastIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes toastOut {
+            to {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+        }
+
+        .toast-icon {
+            font-size: 1.5em;
+            animation: spin 0.5s ease;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg) scale(0.5); }
+            to { transform: rotate(360deg) scale(1); }
+        }
+
+        .terminal-title {
+            margin-left: 15px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85em;
+            color: var(--text-secondary);
+        }
+
+        .terminal-body {
+            padding: 20px;
+            padding-right: 120px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95em;
+            position: relative;
+        }
+
+        .terminal-body code {
+            color: var(--terminal-green);
+            display: block;
+            white-space: pre;
+            line-height: 1.6;
+        }
+
+        .terminal-body code.typing {
+            overflow: hidden;
+            border-right: 2px solid var(--terminal-green);
+            white-space: nowrap;
+            display: inline-block;
+            animation: codeTyping 2s steps(80) forwards, blink 0.75s step-end infinite;
+        }
+
+        @keyframes codeTyping {
+            from { 
+                max-width: 0; 
+            }
+            to { 
+                max-width: 100%; 
+            }
+        }
+
+        .terminal-prompt-line::before {
+            content: '$ ';
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid var(--terminal-green);
+            color: var(--terminal-green);
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            z-index: 10;
+        }
+
+        .copy-btn:hover {
+            background: var(--terminal-green);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 255, 65, 0.3);
+        }
+
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 25px 0;
+            background: rgba(18, 18, 18, 0.6);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        th, td {
+            padding: 18px 20px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        th {
+            background: rgba(29, 185, 84, 0.15);
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.9em;
+        }
+
+        td {
+            color: var(--text-secondary);
+        }
+
+        td:first-child {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr {
+            transition: background 0.2s ease;
+        }
+
+        tr:hover {
+            background: rgba(29, 185, 84, 0.05);
+        }
+
+        .success {
+            background: rgba(29, 185, 84, 0.1);
+            border-left: 4px solid var(--spotify-green);
+            padding: 25px;
+            border-radius: 12px;
+            margin: 30px 0;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border: 1px solid rgba(29, 185, 84, 0.3);
+        }
+
+        .success-icon {
+            font-size: 2.5em;
+            flex-shrink: 0;
+        }
+
+        .success-content {
+            flex: 1;
+        }
+
+        .success strong {
+            color: var(--text-primary);
+            font-size: 1.2em;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        code {
+            background: rgba(29, 185, 84, 0.1);
+            color: var(--spotify-green);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading-indicator {
+            display: inline-block;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 20px;
+            }
+            
+            .header h1 {
+                font-size: 2.5em;
+            }
+            
+            .download-btn {
+                padding: 15px 30px;
+                font-size: 1em;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .step {
+                padding: 25px;
+            }
+
+            .step-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="scanline"></div>
+    
+    <div class="container">
+        <div class="header">
+            <div class="terminal-prompt">oniisama@spotify:~$ ./install-controls.sh</div>
+            <h1>Spotify Control Suite</h1>
+            <p class="subtitle">Wallpaper Engine Integration</p>
+        </div>
+
+        <div class="download-section">
+            <h2>Get Started</h2>
+            <div class="btn-group">
+                <button class="download-btn" onclick="downloadAllScripts()">
+                    <span>📦</span> Download All Scripts
+                </button>
+                <button class="download-btn" onclick="downloadIndividual()">
+                    <span>📄</span> Individual Downloads
+                </button>
+            </div>
+        </div>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">⏯️</div>
+                <h3>Play/Pause</h3>
+                <p>Toggle playback instantly</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⏭️</div>
+                <h3>Skip Tracks</h3>
+                <p>Next/Previous control</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔊</div>
+                <h3>Volume</h3>
+                <p>System-wide adjustment</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔇</div>
+                <h3>Mute</h3>
+                <p>Quick silence toggle</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <span class="step-number">1</span>
+                <h2>Create Tools Folder</h2>
+            </div>
+            <p>Open PowerShell as Administrator and create the directory:</p>
+            <div class="terminal">
+                <div class="terminal-header">
+                    <span class="terminal-dot dot-close"></span>
+                    <span class="terminal-dot dot-minimize"></span>
+                    <span class="terminal-dot dot-maximize"></span>
+                    <span class="terminal-title">PowerShell</span>
+                </div>
+                <div class="terminal-body">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code class="terminal-prompt-line">New-Item -Path "C:\Tools" -ItemType Directory -Force</code>
+                </div>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <span class="step-number">2</span>
+                <h2>Download & Extract</h2>
+            </div>
+            <p>Get all 6 PowerShell scripts using the download button above, then extract to <code>C:\Tools</code></p>
+            <div class="success">
+                <span class="success-icon">✓</span>
+                <div class="success-content">
+                    <strong>Package includes:</strong>
+                    playpause.ps1 • skip.ps1 • prev.ps1 • volumeup.ps1 • volumedown.ps1 • mute.ps1
+                </div>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <span class="step-number">3</span>
+                <h2>Test Scripts</h2>
+            </div>
+            <p>Verify everything works by running a test command:</p>
+            <div class="terminal">
+                <div class="terminal-header">
+                    <span class="terminal-dot dot-close"></span>
+                    <span class="terminal-dot dot-minimize"></span>
+                    <span class="terminal-dot dot-maximize"></span>
+                    <span class="terminal-title">PowerShell</span>
+                </div>
+                <div class="terminal-body">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code class="terminal-prompt-line">powershell.exe -ExecutionPolicy Bypass -File "C:\Tools\playpause.ps1"</code>
+                </div>
+            </div>
+            <p style="margin-top: 15px; color: var(--spotify-green);">→ Spotify should pause/play immediately</p>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <span class="step-number">4</span>
+                <h2>Configure Wallpaper Engine</h2>
+            </div>
+            <p>Navigate to: <strong>Wallpaper Engine → Settings → General → Media → Custom Commands</strong></p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Function</th>
+                        <th>Command</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>▶️ Play/Pause</td>
+                        <td><code>powershell.exe -ExecutionPolicy Bypass -File "C:\Tools\playpause.ps1"</code></td>
+                    </tr>
+                    <tr>
+                        <td>⏭️ Next Track</td>
+                        <td><code>powershell.exe -ExecutionPolicy Bypass -File "C:\Tools\skip.ps1"</code></td>
+                    </tr>
+                    <tr>
+                        <td>⏮️ Previous Track</td>
+                        <td><code>powershell.exe -ExecutionPolicy Bypass -File "C:\Tools\prev.ps1"</code></td>
+                    </tr>
+                    <tr>
+                        <td>🔊 Volume Up</td>
+                        <td><code>powershell.exe -ExecutionPolicy Bypass -File "C:\Tools\volumeup.ps1"</code></td>
+                    </tr>
+                    <tr>
+                        <td>🔉 Volume Down</td>
+                        <td><code>powershell.exe -ExecutionPolicy Bypass -File "C:\Tools\volumedown.ps1"</code></td>
+                    </tr>
+                    <tr>
+                        <td>🔇 Mute/Unmute</td>
+                        <td><code>powershell.exe -ExecutionPolicy Bypass -File "C:\Tools\mute.ps1"</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="success" style="margin-top: 50px; background: rgba(29, 185, 84, 0.15); border-color: var(--spotify-green);">
+            <span class="success-icon">🕸️</span>
+            <div class="success-content">
+                <strong>Installation Complete!</strong>
+                Your Spotify controls are now fully integrated with Wallpaper Engine
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Script contents
+        const scripts = {
+            'playpause.ps1': `Add-Type -TypeDefinition @"
+using System.Runtime.InteropServices;
+public class MediaKeys {
+    [DllImport("user32.dll")]
+    public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, System.IntPtr dwExtraInfo);
+}
+"@
+# 0xB3 = Play/Pause
+[MediaKeys]::keybd_event(0xB3, 0, 0, [IntPtr]::Zero)`,
+
+            'skip.ps1': `Add-Type -TypeDefinition @"
+using System.Runtime.InteropServices;
+public class MediaKeys {
+    [DllImport("user32.dll")]
+    public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, System.IntPtr dwExtraInfo);
+}
+"@
+# 0xB0 = Next Track
+[MediaKeys]::keybd_event(0xB0, 0, 0, [IntPtr]::Zero)`,
+
+            'prev.ps1': `Add-Type -TypeDefinition @"
+using System.Runtime.InteropServices;
+public class MediaKeys {
+    [DllImport("user32.dll")]
+    public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, System.IntPtr dwExtraInfo);
+}
+"@
+# 0xB1 = Previous Track
+[MediaKeys]::keybd_event(0xB1, 0, 0, [IntPtr]::Zero)`,
+
+            'volumeup.ps1': `Add-Type -TypeDefinition @"
+using System.Runtime.InteropServices;
+public class MediaKeys {
+    [DllImport("user32.dll")]
+    public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, System.IntPtr dwExtraInfo);
+}
+"@
+# 0xAF = Volume Up
+[MediaKeys]::keybd_event(0xAF, 0, 0, [IntPtr]::Zero)`,
+
+            'volumedown.ps1': `Add-Type -TypeDefinition @"
+using System.Runtime.InteropServices;
+public class MediaKeys {
+    [DllImport("user32.dll")]
+    public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, System.IntPtr dwExtraInfo);
+}
+"@
+# 0xAE = Volume Down
+[MediaKeys]::keybd_event(0xAE, 0, 0, [IntPtr]::Zero)`,
+
+            'mute.ps1': `Add-Type -TypeDefinition @"
+using System.Runtime.InteropServices;
+public class MediaKeys {
+    [DllImport("user32.dll")]
+    public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, System.IntPtr dwExtraInfo);
+}
+"@
+# 0xAD = Mute/Unmute
+[MediaKeys]::keybd_event(0xAD, 0, 0, [IntPtr]::Zero)`
+        };
+
+        function copyCode(button) {
+            const terminalBody = button.parentElement;
+            const codeElement = terminalBody.querySelector('code');
+            const text = codeElement.textContent.replace('$ ', '');
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = 'var(--terminal-green)';
+                button.style.color = '#000';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = 'rgba(0, 255, 65, 0.1)';
+                    button.style.color = 'var(--terminal-green)';
+                }, 2000);
+            }).catch(err => {
+                button.textContent = 'Failed';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                }, 2000);
+            });
+        }
+
+        function downloadAllScripts() {
+            const downloadBtn = event.target.closest('.download-btn');
+            if (!downloadBtn) return;
+            
+            const originalHTML = downloadBtn.innerHTML;
+            
+            downloadBtn.innerHTML = '<span class="loading-indicator">⏳</span> Preparing files...';
+            downloadBtn.disabled = true;
+            
+            setTimeout(() => {
+                Object.keys(scripts).forEach((filename, index) => {
+                    setTimeout(() => {
+                        downloadFile(filename, scripts[filename]);
+                    }, index * 400);
+                });
+                
+                setTimeout(() => {
+                    downloadBtn.innerHTML = '<span>✓</span> Downloaded!';
+                    showToast('All scripts downloaded successfully!', '🎉');
+                    setTimeout(() => {
+                        downloadBtn.innerHTML = originalHTML;
+                        downloadBtn.disabled = false;
+                    }, 2500);
+                }, Object.keys(scripts).length * 400 + 500);
+            }, 800);
+        }
+
+        function downloadIndividual() {
+            showFileSelectionModal();
+        }
+
+        function showFileSelectionModal() {
+            // Create modal overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            
+            // Create modal
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            
+            // Modal header
+            const header = document.createElement('div');
+            header.className = 'modal-header';
+            header.innerHTML = `
+                <h3>📦 Select Script to Download</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            `;
+            
+            // Modal body
+            const body = document.createElement('div');
+            body.className = 'modal-body';
+            
+            // File list
+            const fileList = document.createElement('div');
+            fileList.className = 'file-list';
+            
+            // File descriptions
+            const fileDescriptions = {
+                'playpause.ps1': 'Toggle play/pause',
+                'skip.ps1': 'Skip to next track',
+                'prev.ps1': 'Previous track',
+                'volumeup.ps1': 'Increase volume',
+                'volumedown.ps1': 'Decrease volume',
+                'mute.ps1': 'Mute/unmute audio'
+            };
+            
+            const fileIcons = {
+                'playpause.ps1': '⏯️',
+                'skip.ps1': '⏭️',
+                'prev.ps1': '⏮️',
+                'volumeup.ps1': '🔊',
+                'volumedown.ps1': '🔉',
+                'mute.ps1': '🔇'
+            };
+            
+            // Add download all option
+            const downloadAllItem = document.createElement('div');
+            downloadAllItem.className = 'file-item download-all-modal';
+            downloadAllItem.innerHTML = `
+                <div class="file-icon">📦</div>
+                <div class="file-info">
+                    <div class="file-name">Download All Scripts</div>
+                    <div class="file-desc">Get all 6 files at once</div>
+                </div>
+            `;
+            downloadAllItem.onclick = () => {
+                closeModal();
+                downloadAllScripts();
+            };
+            fileList.appendChild(downloadAllItem);
+            
+            // Add individual files
+            Object.keys(scripts).forEach(filename => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <div class="file-icon">${fileIcons[filename]}</div>
+                    <div class="file-info">
+                        <div class="file-name">${filename}</div>
+                        <div class="file-desc">${fileDescriptions[filename]}</div>
+                    </div>
+                `;
+                fileItem.onclick = () => {
+                    closeModal();
+                    downloadFile(filename, scripts[filename]);
+                };
+                fileList.appendChild(fileItem);
+            });
+            
+            body.appendChild(fileList);
+            modal.appendChild(header);
+            modal.appendChild(body);
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+            
+            // Close on overlay click
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    closeModal();
+                }
+            });
+        }
+
+        function closeModal() {
+            const overlay = document.querySelector('.modal-overlay');
+            if (overlay) {
+                overlay.style.animation = 'fadeOut 0.3s ease forwards';
+                const modal = overlay.querySelector('.modal');
+                if (modal) {
+                    modal.style.animation = 'modalPopOut 0.3s ease forwards';
+                }
+                setTimeout(() => {
+                    overlay.remove();
+                }, 300);
+            }
+        }
+
+        // Add fadeOut and modalPopOut animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                to { opacity: 0; }
+            }
+            @keyframes modalPopOut {
+                to { transform: scale(0.9); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        function downloadFile(filename, content) {
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            
+            setTimeout(() => {
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            }, 100);
+            
+            // Show success toast
+            showToast(`Downloaded ${filename}`, '✓');
+        }
+
+        function showToast(message, icon = '✓') {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `
+                <span class="toast-icon">${icon}</span>
+                <span>${message}</span>
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Smooth scroll for any internal links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add parallax effect to background
+        let ticking = false;
+        document.addEventListener('scroll', function() {
+            if (!ticking) {
+                window.requestAnimationFrame(function() {
+                    const scrolled = window.pageYOffset;
+                    const parallax = document.querySelector('body::before');
+                    if (parallax) {
+                        document.body.style.backgroundPositionY = -(scrolled * 0.3) + 'px';
+                    }
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+
+        // Typing animation for terminal code blocks on scroll
+        const observerOptions = {
+            threshold: 0.3,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const codeElement = entry.target.querySelector('code');
+                    const terminal = entry.target.closest('.terminal');
+                    
+                    if (codeElement && !codeElement.classList.contains('animated')) {
+                        codeElement.classList.add('typing', 'animated');
+                        if (terminal) terminal.classList.add('typing-active');
+                        
+                        // Remove typing class and cursor after animation completes
+                        setTimeout(() => {
+                            codeElement.classList.remove('typing');
+                            codeElement.style.borderRight = 'none';
+                            codeElement.style.maxWidth = '100%';
+                            codeElement.style.animation = 'none';
+                            if (terminal) terminal.classList.remove('typing-active');
+                        }, 2500);
+                    }
+                }
+            });
+        }, observerOptions);
+
+        // Observe all terminal bodies
+        document.querySelectorAll('.terminal-body').forEach(terminal => {
+            observer.observe(terminal);
+        });
+
+        // Add stagger animation to feature cards
+        const featureCards = document.querySelectorAll('.feature-card');
+        featureCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 1000 + (index * 100));
+        });
+
+        // Add stagger animation to steps
+        const steps = document.querySelectorAll('.step');
+        steps.forEach((step, index) => {
+            step.style.opacity = '0';
+            step.style.transform = 'translateX(-20px)';
+            setTimeout(() => {
+                step.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+                step.style.opacity = '1';
+                step.style.transform = 'translateX(0)';
+            }, 1500 + (index * 200));
+        });
+
+        // Scroll progress bar
+        window.addEventListener('scroll', () => {
+            const progressBar = document.getElementById('progressBar');
+            const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (window.pageYOffset / windowHeight) * 100;
+            progressBar.style.width = scrolled + '%';
+        });
+
+        // Add smooth scroll behavior
+        document.documentElement.style.scrollBehavior = 'smooth';
+
+        // Keyboard shortcut: Press 'D' to download
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'd' || e.key === 'D') {
+                if (document.activeElement.tagName !== 'INPUT' && 
+                    document.activeElement.tagName !== 'TEXTAREA' &&
+                    !document.querySelector('.modal')) {
+                    e.preventDefault();
+                    const downloadBtns = document.querySelectorAll('.download-btn');
+                    if (downloadBtns[0]) {
+                        downloadBtns[0].click();
+                    }
+                }
+            }
+            // ESC to close modal
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Add easter egg: Konami code
+        let konamiCode = [];
+        const konamiSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+        
+        document.addEventListener('keydown', (e) => {
+            konamiCode.push(e.key);
+            if (konamiCode.length > konamiSequence.length) {
+                konamiCode.shift();
+            }
+            
+            if (JSON.stringify(konamiCode) === JSON.stringify(konamiSequence)) {
+                document.body.style.animation = 'rainbow 2s linear infinite';
+                setTimeout(() => {
+                    document.body.style.animation = '';
+                }, 5000);
+                konamiCode = [];
+            }
+        });
+    </script>
+</body>
+</html>
